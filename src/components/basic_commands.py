@@ -496,17 +496,17 @@ def reset(transport, idx, to):
     cmd = struct.pack('<HHH', Commands.CMD_RESET_REQ, 2, HCICommands.BT_HCI_OP_RESET);
     transport.send(idx, cmd);
     
-    packet = transport.recv(idx, 5, to);
+    packet = transport.recv(idx, 8, to);
     
-    if ( 5 != len(packet) ):
+    if ( 8 != len(packet) ):
         raise Exception("Reset command failed: Response too short (Expected %i bytes got %i bytes)" % (5, len(packet)));
     
-    RespCmd, RespLen, status = struct.unpack('<HHB', packet);
+    RespCmd, RespLen, status, ncmd, opcode = struct.unpack('<HHBBH', packet);
     
     if ( RespCmd != Commands.CMD_RESET_RSP ):
         raise Exception("Reset command failed: Inappropriate command response received");
     
-    if ( RespLen != 1 ):
+    if ( RespLen != 4 ):
         raise Exception("Reset command failed: Response length field corrupted (%i)" % RespLen);
     
     return status;
